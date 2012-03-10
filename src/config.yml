@@ -1,0 +1,13 @@
+EasyTitles:
+  Debug: false
+  Version: '1.1'
+  ListWidth: 4
+  ListHeight: 5
+  DefaultFormat: '&f[&2@&f] &7%1$s: &f%2$s'
+  DefaultTitle: Visitor
+  Groups:
+    Traveler:
+      Rank: 10
+      Format: '&f[&2@&f] &7%1$s: &f%2$s'
+      Titles:
+      - Traveler
