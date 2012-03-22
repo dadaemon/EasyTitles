@@ -30,6 +30,7 @@ public class EasyTitlesConfig {
 
     public EasyTitlesConfig(EasyTitles plugin) {
         this.plugin = plugin;
+        n = plugin.name;
 
         if (!(new File(plugin.getDataFolder(), "config.yml")).exists()) {
             plugin.writeLog("Config file defaults are being copied");
@@ -86,13 +87,10 @@ public class EasyTitlesConfig {
 
             c = plugin.getConfig();
             p = getPlayerConfig();
-
-            n = plugin.name;
         } else {
             c = plugin.getConfig();
             reloadPlayerConfig();
             p = getPlayerConfig();
-            n = plugin.name;
 
             String version = c.getString(n + ".Version", "0.1");
             if (!version.equals(plugin.version)) {
@@ -105,8 +103,8 @@ public class EasyTitlesConfig {
                     version = "1.0";
                 }
 
-                // Version 1.0 -> 1.1 ->
-                if (version.equals("1.0") || version.equals("1.1")) {
+                // Version 1.0 -> 1.1 -> 1.2 ->
+                if (version.equals("1.0") || version.equals("1.1") || version.equals("1.2")) {
                 }
 
                 c.set(n + ".Version", plugin.version);
@@ -119,7 +117,12 @@ public class EasyTitlesConfig {
             Set<String> keys = p.getConfigurationSection(path).getKeys(false);
             plugin.writeLog("Re-checking " + keys.size() + " players.");
             for (String player : keys) {
-                checkPlayer(player);
+                Player pl = Bukkit.getPlayer(player);
+                if (pl == null) {
+                    plugin.writeLog("Player '" + player + "' not online.");
+                } else {
+                    checkPlayer(player);
+                }
             }
         }
     }
@@ -209,13 +212,21 @@ public class EasyTitlesConfig {
 
     public void checkPlayer(String player) {
         List<String[]> titleList = this.getTitles(player);
+
         boolean ok = false;
-        for (String[] t : titleList) {
-            if (t[0].equals(p.getString(n + ".Players." + player + ".Group")) && t[1].equals(p.getString(n + ".Players" + "." + player + ".Title"))) {
-                ok = true;
-                break;
+
+        String selectedGroup = p.getString(n + ".Players." + player + ".Group");
+        String selectedTitle = p.getString(n + ".Players." + player + ".Title");
+
+        if (selectedGroup != null && selectedTitle != null) {
+            for (String[] t : titleList) {
+                if (t[0].equals(selectedGroup) && t[1].equals(selectedTitle)) {
+                    ok = true;
+                    break;
+                }
             }
         }
+
         if (!ok) {
             p.set(n + ".Players." + player + ".Title", null);
             p.set(n + ".Players." + player + ".Group", null);
